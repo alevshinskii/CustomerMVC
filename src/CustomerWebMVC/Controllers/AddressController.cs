@@ -48,6 +48,7 @@ namespace CustomerWebMVC.Controllers
                 return RedirectToAction("Index",new {customerId=address.CustomerId});
             }
 
+            ViewBag.Message = "An error occured while adding address in database";
             return View(address);
         }
 
