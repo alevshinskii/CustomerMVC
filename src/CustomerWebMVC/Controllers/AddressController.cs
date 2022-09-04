@@ -61,7 +61,7 @@ namespace CustomerWebMVC.Controllers
                 return View(address);
             }
 
-            return Redirect("NotFound");
+            return new HttpNotFoundResult();
         }
 
         [HttpPost]
@@ -91,7 +91,7 @@ namespace CustomerWebMVC.Controllers
                 return View(address);
             }
 
-            return Redirect("NotFound");
+            return new HttpNotFoundResult();
         }
 
         [HttpPost]

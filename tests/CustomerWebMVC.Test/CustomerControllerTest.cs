@@ -3,7 +3,6 @@ using CustomerManagement.Interfaces;
 using CustomerWebMVC.Controllers;
 using Moq;
 using System.Web.Mvc;
-using Bogus;
 
 namespace CustomerWebMVC.Test
 {
@@ -80,30 +79,30 @@ namespace CustomerWebMVC.Test
             Assert.Equal("Can't add new customer to database", viewResult?.ViewBag.Message);
         }
 
-/*        [Fact]
-        public void ShouldNotBeAbleToCreateCustomerIfModelIsInvalid()
-        {
-            Customer? customer = new Customer()
-            {
-                FirstName = new Faker().Random.String(51),
-                LastName = new Faker().Random.String(51)
-            };
+        /*        [Fact]
+                public void ShouldNotBeAbleToCreateCustomerIfModelIsInvalid()
+                {
+                    Customer? customer = new Customer()
+                    {
+                        FirstName = new Faker().Random.String(51),
+                        LastName = new Faker().Random.String(51)
+                    };
 
-            var customerRepoMock = new Mock<IRepository<Customer>>();
-            customerRepoMock.Setup(x => x.Create(customer)).Returns(customer);
+                    var customerRepoMock = new Mock<IRepository<Customer>>();
+                    customerRepoMock.Setup(x => x.Create(customer)).Returns(customer);
 
-            var controller = new CustomerController(customerRepoMock.Object);
-            controller.ViewData.Model = customer;
-            var result = controller.Create(customer);
-            var viewResult = result as ViewResult;
-            Assert.True(controller.ModelState.IsValid);
+                    var controller = new CustomerController(customerRepoMock.Object);
+                    controller.ViewData.Model = customer;
+                    var result = controller.Create(customer);
+                    var viewResult = result as ViewResult;
+                    Assert.True(controller.ModelState.IsValid);
 
-            customerRepoMock.Verify(x => x.Create(customer), Times.Never);
+                    customerRepoMock.Verify(x => x.Create(customer), Times.Never);
 
-            Assert.NotNull(viewResult);
+                    Assert.NotNull(viewResult);
 
-            Assert.Equal("Customer entity is not valid", viewResult?.ViewBag.Message);
-        }*/
+                    Assert.Equal("Customer entity is not valid", viewResult?.ViewBag.Message);
+                }*/
 
         [Fact]
         public void ShouldBeAbleToCallCustomerEditPage()
@@ -204,6 +203,110 @@ namespace CustomerWebMVC.Test
             var resultView = result as ViewResult;
 
             Assert.NotNull(resultView);
+        }
+
+        [Fact]
+        public void ShouldBeAbleToRedirectFromEditToNotFoundPage()
+        {
+            Customer customer = new Customer()
+            {
+                Id = 1,
+                LastName = "LastName"
+            };
+            Customer? customerNull = null;
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customerNull);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            var result = controller.Edit(customer.Id);
+            var notFoundResult = result as HttpNotFoundResult;
+
+            Assert.NotNull(notFoundResult);
+        }
+
+        [Fact]
+        public void ShouldShowMessageIfCanNotUpdateCustomer()
+        {
+            Customer customer = new Customer()
+            {
+                Id = 1,
+                LastName = "LastName"
+            };
+            Customer? customerNull = null;
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Update(customer)).Returns(false);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            var result = controller.Edit(customer);
+
+            var view = result as ViewResult;
+            Assert.NotNull(view);
+
+            Assert.Equal("Can't update customer in database", view?.ViewBag.Message);
+        }
+
+        [Fact]
+        public void ShouldBeAbleToRedirectFromDetailsToNotFoundPage()
+        {
+            Customer customer = new Customer()
+            {
+                Id = 1,
+                LastName = "LastName"
+            };
+            Customer? customerNull = null;
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customerNull);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            var result = controller.Details(customer.Id);
+            var notFoundResult = result as HttpNotFoundResult;
+
+            Assert.NotNull(notFoundResult);
+        }
+
+        [Fact]
+        public void ShouldBeAbleToRedirectFromDeleteToNotFoundPage()
+        {
+            Customer customer = new Customer()
+            {
+                Id = 1,
+                LastName = "LastName"
+            };
+            Customer? customerNull = null;
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customerNull);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            var result = controller.Delete(customer.Id);
+            var notFoundResult = result as HttpNotFoundResult;
+
+            Assert.NotNull(notFoundResult);
+        }
+
+        [Fact]
+        public void ShouldShowMessageIfCanNotDeleteCustomer()
+        {
+            Customer customer = new Customer()
+            {
+                Id = 1,
+                LastName = "LastName"
+            };
+            Customer? customerNull = null;
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Delete(customer.Id)).Returns(false);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            var result = controller.Delete(customer);
+
+            var view = result as ViewResult;
+            Assert.NotNull(view);
+
+            Assert.Equal("Can't delete customer from database", view?.ViewBag.Message);
         }
     }
 }

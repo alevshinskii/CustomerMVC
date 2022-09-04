@@ -58,7 +58,7 @@ namespace CustomerWebMVC.Controllers
             if(note!=null)
                 return View(note);
 
-            return RedirectToRoute("NotFound");
+            return new HttpNotFoundResult();
         }
 
         [HttpPost]
@@ -86,7 +86,7 @@ namespace CustomerWebMVC.Controllers
             if(note!=null)
                 return View(note);
 
-            return RedirectToRoute("NotFound");
+            return new HttpNotFoundResult();
         }
         [HttpPost]
         public ActionResult Delete(Note note)

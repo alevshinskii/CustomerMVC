@@ -204,5 +204,39 @@ namespace CustomerWebMVC.Test
             var model = view?.Model as Note;
             Assert.Equal(note,model);
         }
+
+        [Fact]
+        public void ShouldNotBeAbleToRedirectFromEditToNotFound()
+        { 
+            var note = new Note() { Id = 0, CustomerId = 0, Text = "text"};
+            Note? noteNull = null;
+            var noteRepoMock = new Mock<IRepository<Note>>();
+            noteRepoMock.Setup(x => x.Read(note.Id)).Returns(noteNull);
+
+            var controller = new NoteController(noteRepoMock.Object);
+            var result = controller.Edit(note.Id);
+
+            noteRepoMock.Verify(x=>x.Read(note.Id),Times.Once);
+
+            var view = result as HttpNotFoundResult;
+            Assert.NotNull(view);
+        }
+
+        [Fact]
+        public void ShouldNotBeAbleToRedirectFromDeleteToNotFound()
+        { 
+            var note = new Note() { Id = 0, CustomerId = 0, Text = "text"};
+            Note? noteNull = null;
+            var noteRepoMock = new Mock<IRepository<Note>>();
+            noteRepoMock.Setup(x => x.Read(note.Id)).Returns(noteNull);
+
+            var controller = new NoteController(noteRepoMock.Object);
+            var result = controller.Delete(note.Id);
+
+            noteRepoMock.Verify(x=>x.Read(note.Id),Times.Once);
+
+            var view = result as HttpNotFoundResult;
+            Assert.NotNull(view);
+        }
     }
 }

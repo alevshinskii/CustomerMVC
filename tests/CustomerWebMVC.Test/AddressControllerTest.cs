@@ -211,5 +211,39 @@ namespace CustomerWebMVC.Test
             var model = view?.Model as Address;
             Assert.Equal(address,model);
         }
+
+        [Fact]
+        public void ShouldNotBeAbleToRedirectFromEditToNotFound()
+        { 
+            var address = new Address() { AddressId = 0 , AddressLine = "AddressLine"};
+            Address? addressNull = null;
+            var addressRepoMock = new Mock<IRepository<Address>>();
+            addressRepoMock.Setup(x => x.Read(address.AddressId)).Returns(addressNull);
+
+            var controller = new AddressController(addressRepoMock.Object);
+            var result = controller.Edit(address.AddressId);
+
+            addressRepoMock.Verify(x=>x.Read(address.AddressId),Times.Once);
+
+            var view = result as HttpNotFoundResult;
+            Assert.NotNull(view);
+        }
+
+        [Fact]
+        public void ShouldNotBeAbleToRedirectFromDeleteToNotFound()
+        { 
+            var address = new Address() { AddressId = 0 , AddressLine = "AddressLine"};
+            Address? addressNull = null;
+            var addressRepoMock = new Mock<IRepository<Address>>();
+            addressRepoMock.Setup(x => x.Read(address.AddressId)).Returns(addressNull);
+
+            var controller = new AddressController(addressRepoMock.Object);
+            var result = controller.Delete(address.AddressId);
+
+            addressRepoMock.Verify(x=>x.Read(address.AddressId),Times.Once);
+
+            var view = result as HttpNotFoundResult;
+            Assert.NotNull(view);
+        }
     }
 }

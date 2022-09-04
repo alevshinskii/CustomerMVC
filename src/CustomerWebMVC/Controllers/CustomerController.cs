@@ -1,4 +1,5 @@
-﻿using CustomerManagement.Entities;
+﻿using System.Linq;
+using CustomerManagement.Entities;
 using CustomerManagement.Interfaces;
 using CustomerManagement.Repositories;
 using System.Web.Mvc;
@@ -11,6 +12,8 @@ namespace CustomerWebMVC.Controllers
         private readonly IRepository<Address> _addressRepository=new AddressRepository();
         private readonly IRepository<Note> _noteRepository=new NoteRepository();
 
+        public int ItemsOnPage = 10;
+
         public CustomerController() { }
 
         public CustomerController(IRepository<Customer> customerRepository)
@@ -19,6 +22,13 @@ namespace CustomerWebMVC.Controllers
         }
 
         public ActionResult Index()
+        {
+            var customers = _customerRepository.ReadAll().Take(ItemsOnPage).ToList();
+            
+            return View(customers);
+        }
+
+        public ActionResult Index(int page)
         {
             var customers = _customerRepository.ReadAll();
 
@@ -36,7 +46,6 @@ namespace CustomerWebMVC.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Message = "Customer entity is not valid";
-                
                 return View();
             }
 
@@ -44,11 +53,8 @@ namespace CustomerWebMVC.Controllers
             {
                 return RedirectToAction("Index");
             }
-            else
-            {
-                ViewBag.Message = "Can't add new customer to database";
-            }
-            
+                
+            ViewBag.Message = "Can't add new customer to database";
             return View();
         }
 
@@ -56,45 +62,53 @@ namespace CustomerWebMVC.Controllers
         {
             var customer = _customerRepository.Read(id);
 
-            return View(customer);
+            if(customer!=null)
+                return View(customer);
+
+            return new HttpNotFoundResult();
         }
 
         [HttpPost]
         public ActionResult Edit(Customer customer)
         {
-            if (ModelState.IsValid)
-            {
-                if (_customerRepository.Update(customer))
-                {
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    ViewBag.Message = "Can't update customer in database";
-                }
-            }
-            else
+            if (!ModelState.IsValid)
             {
                 ViewBag.Message = "Customer entity is not valid";
+                return View(customer);
             }
 
+            if (_customerRepository.Update(customer))
+            {
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Message = "Can't update customer in database";
             return View(customer);
         }
 
         public ActionResult Details(int id)
         {
             var customer = _customerRepository.Read(id);
-            customer.Addresses = _addressRepository.ReadAll(id);
-            customer.Notes = _noteRepository.ReadAll(id);
 
-            return View(customer);
+            if (customer != null)
+            {
+                customer.Addresses = _addressRepository.ReadAll(id);
+                customer.Notes = _noteRepository.ReadAll(id);
+
+                return View(customer);
+            }
+
+            return new HttpNotFoundResult();
         }
 
         public ActionResult Delete(int id)
         {
             var customer = _customerRepository.Read(id);
 
-            return View(customer);
+            if(customer!=null)
+                return View(customer);
+
+            return new HttpNotFoundResult();
         }
 
         [HttpPost]
