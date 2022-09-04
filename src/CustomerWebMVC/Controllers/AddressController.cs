@@ -12,37 +12,97 @@ namespace CustomerWebMVC.Controllers
     public class AddressController : Controller
     {
         private readonly IRepository<Address> _addressRepository = new AddressRepository();
+        private readonly IRepository<Customer> _customerRepository = new CustomerRepository();
 
         public AddressController(){}
         public AddressController(IRepository<Address> addressRepository)
         {
             _addressRepository = addressRepository;
         }
-        // GET: Address
+
         public ActionResult Index(int customerId)
         {
             var addresses = _addressRepository.ReadAll(customerId);
+            ViewBag.CustomerName = _customerRepository.Read(customerId)?.LastName ?? customerId.ToString();
+            ViewBag.CustomerId = customerId;
             return View(addresses);
         }
 
-        public ActionResult Create()
+        public ActionResult Create(int customerId)
         {
-            throw new NotImplementedException();
+            var address = new Address() { CustomerId = customerId };
+            return View(address);
         }
 
-        public ActionResult Edit(int id)
+        [HttpPost]
+        public ActionResult Create(Address address)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Message = "Address is not valid";
+                return View(address);
+            }
+
+            if (_addressRepository.Create(address) != null)
+            {
+                return RedirectToAction("Index",new {customerId=address.CustomerId});
+            }
+
+            return View(address);
         }
 
-        public ActionResult Details(int id)
+        public ActionResult Edit(int addressId)
         {
-            throw new NotImplementedException();
+            var address = _addressRepository.Read(addressId);
+
+            if (address != null)
+            {
+                return View(address);
+            }
+
+            return Redirect("NotFound");
         }
 
-        public ActionResult Delete(int id)
+        [HttpPost]
+        public ActionResult Edit(Address address)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Message = "Address is not valid";
+                return View(address);
+            }
+
+            if (_addressRepository.Update(address))
+            {
+                return RedirectToAction("Index",new {customerId=address.CustomerId});
+            }
+
+            ViewBag.Message = "An error occured while updating address in database";
+            return View(address);
+        }
+
+        public ActionResult Delete(int addressId)
+        {
+            var address = _addressRepository.Read(addressId);
+
+            if (address != null)
+            {
+                return View(address);
+            }
+
+            return Redirect("NotFound");
+        }
+
+        [HttpPost]
+        public ActionResult Delete(Address address)
+        {
+            if (_addressRepository.Delete(address.AddressId))
+            {
+                return RedirectToAction("Index",new {customerId=address.CustomerId});
+            }
+
+            ViewBag.Message = "An error occured while deleting address in database";
+            return View(address);
         }
     }
 }

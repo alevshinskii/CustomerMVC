@@ -2,6 +2,7 @@
 using CustomerManagement.Interfaces;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 
 namespace CustomerManagement.Repositories
 {
@@ -16,29 +17,26 @@ namespace CustomerManagement.Repositories
                 var command = new SqlCommand("INSERT INTO [Address] (AddressLine,AddressLine2,AddressType,City,Country,CustomerId,PostalCode,State) VALUES" +
                                              "(@AddressLine,@AddressLine2,@AddressType,@City,@Country,@CustomerId,@PostalCode,@State)", connection);
 
-                var idParameter = new SqlParameter("@AddressId", SqlDbType.Int)
-                {
-                    Value = entity.AddressId
-                };
+            
                 var addressLineParameter = new SqlParameter("@AddressLine", SqlDbType.NVarChar, 100)
                 {
                     Value = entity.AddressLine
                 };
                 var addressLine2Parameter = new SqlParameter("@AddressLine2", SqlDbType.NVarChar, 100)
                 {
-                    Value = entity.AddressLine2
+                    Value = entity.AddressLine2 ?? SqlString.Null
                 };
                 var addressTypeParameter = new SqlParameter("@AddressType", SqlDbType.NVarChar, 20)
                 {
-                    Value = entity.AddressType
+                    Value = entity.AddressType ?? SqlString.Null
                 };
                 var cityParameter = new SqlParameter("@City", SqlDbType.NVarChar, 50)
                 {
-                    Value = entity.City
+                    Value = entity.City?? SqlString.Null
                 };
                 var countryParameter = new SqlParameter("@Country", SqlDbType.NVarChar, 100)
                 {
-                    Value = entity.Country
+                    Value = entity.Country?? SqlString.Null
                 };
                 var customerIdParameter = new SqlParameter("@CustomerId", SqlDbType.Int)
                 {
@@ -46,14 +44,13 @@ namespace CustomerManagement.Repositories
                 };
                 var postalCodeParameter = new SqlParameter("@PostalCode", SqlDbType.NVarChar, 6)
                 {
-                    Value = entity.PostalCode
+                    Value = entity.PostalCode?? SqlString.Null
                 };
                 var stateParameter = new SqlParameter("@State", SqlDbType.NVarChar, 20)
                 {
-                    Value = entity.State
+                    Value = entity.State?? SqlString.Null
                 };
-
-                command.Parameters.Add(idParameter);
+                
                 command.Parameters.Add(addressLineParameter);
                 command.Parameters.Add(addressLine2Parameter);
                 command.Parameters.Add(addressTypeParameter);
@@ -210,19 +207,19 @@ namespace CustomerManagement.Repositories
                 };
                 var addressLine2Parameter = new SqlParameter("@AddressLine2", SqlDbType.NVarChar, 100)
                 {
-                    Value = entity.AddressLine2
+                    Value = entity.AddressLine2?? SqlString.Null
                 };
                 var addressTypeParameter = new SqlParameter("@AddressType", SqlDbType.NVarChar, 20)
                 {
-                    Value = entity.AddressType
+                    Value = entity.AddressType?? SqlString.Null
                 };
                 var cityParameter = new SqlParameter("@City", SqlDbType.NVarChar, 50)
                 {
-                    Value = entity.City
+                    Value = entity.City?? SqlString.Null
                 };
                 var countryParameter = new SqlParameter("@Country", SqlDbType.NVarChar, 100)
                 {
-                    Value = entity.Country
+                    Value = entity.Country?? SqlString.Null
                 };
                 var customerIdParameter = new SqlParameter("@CustomerId", SqlDbType.Int)
                 {
@@ -230,11 +227,11 @@ namespace CustomerManagement.Repositories
                 };
                 var postalCodeParameter = new SqlParameter("@PostalCode", SqlDbType.NVarChar, 6)
                 {
-                    Value = entity.PostalCode
+                    Value = entity.PostalCode?? SqlString.Null
                 };
                 var stateParameter = new SqlParameter("@State", SqlDbType.NVarChar, 20)
                 {
-                    Value = entity.State
+                    Value = entity.State?? SqlString.Null
                 };
 
                 command.Parameters.Add(idParameter);

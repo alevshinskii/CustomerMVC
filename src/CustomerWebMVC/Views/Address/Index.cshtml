@@ -7,7 +7,7 @@
 <h2>Addresses of Customer @ViewBag.CustomerName</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Create New", "Create", new { customerId = ViewBag.CustomerId})
 </p>
 <table class="table">
     <tr>
@@ -66,9 +66,8 @@
             @Html.DisplayFor(modelItem => item.Country)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.AddressId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.AddressId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.AddressId })
+            @Html.ActionLink("Edit", "Edit", new { addressId=item.AddressId }) |
+            @Html.ActionLink("Delete", "Delete", new { addressId = item.AddressId })
         </td>
     </tr>
 }

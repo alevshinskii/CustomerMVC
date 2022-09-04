@@ -104,11 +104,8 @@ namespace CustomerWebMVC.Controllers
             {
                 return RedirectToAction("Index");
             }
-            else
-            {
-                ViewBag.Message = "Can't delete customer from database";
-            }
 
+            ViewBag.Message = "Can't delete customer from database";
             return View(customer);
         }
     }
