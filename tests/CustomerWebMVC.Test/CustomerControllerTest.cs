@@ -3,6 +3,7 @@ using CustomerManagement.Interfaces;
 using CustomerWebMVC.Controllers;
 using Moq;
 using System.Web.Mvc;
+using Bogus;
 
 namespace CustomerWebMVC.Test
 {
@@ -57,6 +58,52 @@ namespace CustomerWebMVC.Test
             Assert.NotNull(viewResult);
             if (viewResult?.RouteValues.Values != null) Assert.Contains("Index", viewResult.RouteValues.Values);
         }
+
+        [Fact]
+        public void ShouldDisplayMessageIfCanNotCreateCustomer()
+        {
+            Customer? customer = new Customer()
+            {
+                LastName = "LastName"
+            };
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Create(customer)).Returns(customer = null);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            var result = controller.Create(customer);
+
+            customerRepoMock.Verify(x => x.Create(customer), Times.Once);
+
+            var viewResult = result as ViewResult;
+            Assert.NotNull(viewResult);
+            Assert.Equal("Can't add new customer to database", viewResult?.ViewBag.Message);
+        }
+
+/*        [Fact]
+        public void ShouldNotBeAbleToCreateCustomerIfModelIsInvalid()
+        {
+            Customer? customer = new Customer()
+            {
+                FirstName = new Faker().Random.String(51),
+                LastName = new Faker().Random.String(51)
+            };
+
+            var customerRepoMock = new Mock<IRepository<Customer>>();
+            customerRepoMock.Setup(x => x.Create(customer)).Returns(customer);
+
+            var controller = new CustomerController(customerRepoMock.Object);
+            controller.ViewData.Model = customer;
+            var result = controller.Create(customer);
+            var viewResult = result as ViewResult;
+            Assert.True(controller.ModelState.IsValid);
+
+            customerRepoMock.Verify(x => x.Create(customer), Times.Never);
+
+            Assert.NotNull(viewResult);
+
+            Assert.Equal("Customer entity is not valid", viewResult?.ViewBag.Message);
+        }*/
 
         [Fact]
         public void ShouldBeAbleToCallCustomerEditPage()
@@ -123,7 +170,7 @@ namespace CustomerWebMVC.Test
         {
             Customer customer = new Customer()
             {
-                Id=1,
+                Id = 1,
                 LastName = "LastName"
             };
 

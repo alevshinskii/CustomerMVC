@@ -8,7 +8,7 @@ namespace CustomerManagement.Repositories
 {
     public class CustomerRepository : BaseRepository, IRepository<Customer>
     {
-        public Customer Create(Customer entity)
+        public Customer? Create(Customer entity)
         {
             using (var connection = GetConnection())
             {
@@ -64,7 +64,7 @@ namespace CustomerManagement.Repositories
 
         }
 
-        public Customer Read(int entityId)
+        public Customer? Read(int entityId)
         {
             using (var connection = GetConnection())
             {

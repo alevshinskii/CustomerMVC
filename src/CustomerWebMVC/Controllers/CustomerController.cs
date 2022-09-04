@@ -33,22 +33,22 @@ namespace CustomerWebMVC.Controllers
         [HttpPost]
         public ActionResult Create(Customer customer)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (_customerRepository.Create(customer) != null)
-                {
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    ViewBag.Message = "Can't add new customer to database";
-                }
+                ViewBag.Message = "Customer entity is not valid";
+                
+                return View();
+            }
+
+            if (_customerRepository.Create(customer) != null)
+            {
+                return RedirectToAction("Index");
             }
             else
             {
-                ViewBag.Message = "Customer entity is not valid";
+                ViewBag.Message = "Can't add new customer to database";
             }
-
+            
             return View();
         }
 
