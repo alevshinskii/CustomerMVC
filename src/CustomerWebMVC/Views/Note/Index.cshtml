@@ -7,7 +7,7 @@
 <h2>Notes of Customer @ViewBag.CustomerName</h2>
 
 <p>
-    @Html.ActionLink("Create New Note", "Create")
+    @Html.ActionLink("Create New Note", "Create", new { customerId = ViewBag.CustomerId })
 </p>
 <table class="table">
     <tr>

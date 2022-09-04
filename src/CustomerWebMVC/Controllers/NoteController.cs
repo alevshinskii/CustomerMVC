@@ -19,11 +19,11 @@ namespace CustomerWebMVC.Controllers
         public ActionResult Index(int customerId)
         {
             var notesList = _noteRepository.ReadAll(customerId);
+            ViewBag.CustomerId=customerId;
 
             return View(notesList);
         }
 
-        [HttpPost]
         public ActionResult Create(int customerId)
         {
             var note = new Note()
@@ -91,9 +91,10 @@ namespace CustomerWebMVC.Controllers
         [HttpPost]
         public ActionResult Delete(Note note)
         {
+            int? customerId = _noteRepository.Read(note.Id)?.CustomerId;
             if (_noteRepository.Delete(note.Id))
             {
-                return RedirectToAction("Index",new {customerId=note.CustomerId});
+                return RedirectToAction("Index",new {customerId});
             }
 
             ViewBag.Message = "An error occured while deleting note in database";

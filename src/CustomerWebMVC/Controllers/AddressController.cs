@@ -97,9 +97,11 @@ namespace CustomerWebMVC.Controllers
         [HttpPost]
         public ActionResult Delete(Address address)
         {
+            int? customerId = _addressRepository.Read(address.AddressId)?.CustomerId;
+
             if (_addressRepository.Delete(address.AddressId))
             {
-                return RedirectToAction("Index",new {customerId=address.CustomerId});
+                return RedirectToAction("Index",new {customerId});
             }
 
             ViewBag.Message = "An error occured while deleting address in database";

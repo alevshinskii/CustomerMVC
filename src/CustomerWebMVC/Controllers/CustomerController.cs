@@ -1,16 +1,16 @@
-﻿using System.Linq;
-using CustomerManagement.Entities;
+﻿using CustomerManagement.Entities;
 using CustomerManagement.Interfaces;
 using CustomerManagement.Repositories;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace CustomerWebMVC.Controllers
 {
     public class CustomerController : Controller
     {
-        private readonly IRepository<Customer> _customerRepository=new CustomerRepository();
-        private readonly IRepository<Address> _addressRepository=new AddressRepository();
-        private readonly IRepository<Note> _noteRepository=new NoteRepository();
+        private readonly IRepository<Customer> _customerRepository = new CustomerRepository();
+        private readonly IRepository<Address> _addressRepository = new AddressRepository();
+        private readonly IRepository<Note> _noteRepository = new NoteRepository();
 
         public int ItemsOnPage = 10;
 
@@ -21,18 +21,21 @@ namespace CustomerWebMVC.Controllers
             _customerRepository = customerRepository;
         }
 
-        public ActionResult Index()
-        {
-            var customers = _customerRepository.ReadAll().Take(ItemsOnPage).ToList();
-            
-            return View(customers);
-        }
 
-        public ActionResult Index(int page)
+        public ActionResult Index(int? page)
         {
             var customers = _customerRepository.ReadAll();
-
-            return View(customers);
+            ViewBag.PagesCount = customers.Count() / ItemsOnPage + (customers.Count % 10 > 0 ? 1 : 0);
+            if (page > 0)
+            {
+                var customersOnPage = customers.Skip((int)((page - 1) * ItemsOnPage)).Take(ItemsOnPage).ToList();
+                return View(customersOnPage);
+            }
+            else
+            {
+                var customersOnPage = customers.Take(ItemsOnPage).ToList();
+                return View(customersOnPage);
+            }
         }
 
         public ActionResult Create()
@@ -53,7 +56,7 @@ namespace CustomerWebMVC.Controllers
             {
                 return RedirectToAction("Index");
             }
-                
+
             ViewBag.Message = "Can't add new customer to database";
             return View();
         }
@@ -62,7 +65,7 @@ namespace CustomerWebMVC.Controllers
         {
             var customer = _customerRepository.Read(id);
 
-            if(customer!=null)
+            if (customer != null)
                 return View(customer);
 
             return new HttpNotFoundResult();
@@ -105,7 +108,7 @@ namespace CustomerWebMVC.Controllers
         {
             var customer = _customerRepository.Read(id);
 
-            if(customer!=null)
+            if (customer != null)
                 return View(customer);
 
             return new HttpNotFoundResult();

@@ -19,7 +19,19 @@ namespace CustomerWebMVC.Test
         public void ShouldBeAbleToGetCustomersList()
         {
             var controller = new CustomerController();
-            var result = controller.Index();
+            var result = controller.Index(1);
+            var resultView = result as ViewResult;
+            var model = resultView?.Model as List<Customer>;
+
+            Assert.NotNull(model);
+            Assert.NotEmpty(model);
+        }
+
+        [Fact]
+        public void ShouldBeAbleToGetCustomersListWithInvalidPageNum()
+        {
+            var controller = new CustomerController();
+            var result = controller.Index(-1);
             var resultView = result as ViewResult;
             var model = resultView?.Model as List<Customer>;
 
