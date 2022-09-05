@@ -152,23 +152,23 @@ namespace CustomerManagement.Repositories
                 };
                 var firstNameParameter = new SqlParameter("@FirstName", SqlDbType.NVarChar, 50)
                 {
-                    Value = entity.FirstName
+                    Value = entity.FirstName ?? SqlString.Null
                 };
                 var lastNameParameter = new SqlParameter("@LastName", SqlDbType.NVarChar, 50)
                 {
-                    Value = entity.LastName
+                    Value = entity.LastName 
                 };
                 var phoneNumberParameter = new SqlParameter("@PhoneNumber", SqlDbType.NVarChar, 15)
                 {
-                    Value = entity.PhoneNumber
+                    Value = entity.PhoneNumber ?? SqlString.Null
                 };
                 var emailParameter = new SqlParameter("@Email", SqlDbType.NVarChar, 255)
                 {
-                    Value = entity.Email
+                    Value = entity.Email?? SqlString.Null
                 };
                 var totalPurchasesAmountParameter = new SqlParameter("@TotalPurchasesAmount", SqlDbType.Money)
                 {
-                    Value = entity.TotalPurchasesAmount
+                    Value = entity.TotalPurchasesAmount?? SqlMoney.Null
                 };
 
                 command.Parameters.Add(idParameter);
