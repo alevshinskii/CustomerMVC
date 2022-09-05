@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -244,6 +245,75 @@ namespace CustomerWebMVC.Test
 
             var view = result as HttpNotFoundResult;
             Assert.NotNull(view);
+        }
+
+        [Fact]
+        public void ShouldValidateAddressModel()
+        {
+            var address = new Address()
+            {
+                AddressLine = "AddressLine"
+            };
+            var context = new ValidationContext(address, null, null);
+            var results = new List<ValidationResult>();
+            var isModelStateValid = Validator.TryValidateObject(address, context, results, true);
+
+            Assert.True(isModelStateValid);
+        }
+
+        [Fact]
+        public void ShouldNotValidateInvalidAddressModel()
+        {
+            var address = new Address();
+            var context = new ValidationContext(address, null, null);
+            var results = new List<ValidationResult>();
+            var isModelStateValid = Validator.TryValidateObject(address, context, results, true);
+
+            Assert.False(isModelStateValid);
+        }
+
+        [Fact]
+        public void ShouldCreateReturnViewIfModelIsNotValid()
+        {
+            var controller = new AddressController();
+            controller.ModelState.AddModelError("key", "message");
+
+            var result = controller.Create(new Address());
+
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ShouldCreateReturnMessageIfModelIsNotValid()
+        {
+            var controller = new AddressController();
+            controller.ModelState.AddModelError("key", "message");
+
+            controller.Create(new Address());
+
+            Assert.Equal("Address is not valid", controller.ViewBag.Message);
+        }
+
+        [Fact]
+        public void ShouldEditReturnViewIfModelIsNotValid()
+        {
+            var controller = new AddressController();
+            controller.ModelState.AddModelError("key", "message");
+
+            var result = controller.Edit(new Address());
+
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ShouldEditReturnMessageIfModelIsNotValid()
+        {
+            var controller = new AddressController();
+            controller.ModelState.AddModelError("key", "message");
+
+            controller.Edit(new Address());
+
+            Assert.Equal("Address is not valid", controller.ViewBag.Message);
         }
     }
 }

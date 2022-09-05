@@ -2,6 +2,7 @@ using CustomerManagement.Entities;
 using CustomerManagement.Interfaces;
 using CustomerWebMVC.Controllers;
 using Moq;
+using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
 namespace CustomerWebMVC.Test
@@ -90,31 +91,6 @@ namespace CustomerWebMVC.Test
             Assert.NotNull(viewResult);
             Assert.Equal("Can't add new customer to database", viewResult?.ViewBag.Message);
         }
-
-        /*        [Fact]
-                public void ShouldNotBeAbleToCreateCustomerIfModelIsInvalid()
-                {
-                    Customer? customer = new Customer()
-                    {
-                        FirstName = new Faker().Random.String(51),
-                        LastName = new Faker().Random.String(51)
-                    };
-
-                    var customerRepoMock = new Mock<IRepository<Customer>>();
-                    customerRepoMock.Setup(x => x.Create(customer)).Returns(customer);
-
-                    var controller = new CustomerController(customerRepoMock.Object);
-                    controller.ViewData.Model = customer;
-                    var result = controller.Create(customer);
-                    var viewResult = result as ViewResult;
-                    Assert.True(controller.ModelState.IsValid);
-
-                    customerRepoMock.Verify(x => x.Create(customer), Times.Never);
-
-                    Assert.NotNull(viewResult);
-
-                    Assert.Equal("Customer entity is not valid", viewResult?.ViewBag.Message);
-                }*/
 
         [Fact]
         public void ShouldBeAbleToCallCustomerEditPage()
@@ -319,6 +295,75 @@ namespace CustomerWebMVC.Test
             Assert.NotNull(view);
 
             Assert.Equal("Can't delete customer from database", view?.ViewBag.Message);
+        }
+
+        [Fact]
+        public void ShouldCreateReturnViewIfModelIsNotValid()
+        {
+            var controller = new CustomerController();
+            controller.ModelState.AddModelError("key", "message");
+
+            var result = controller.Create(new Customer());
+
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ShouldCreateReturnMessageIfModelIsNotValid()
+        {
+            var controller = new CustomerController();
+            controller.ModelState.AddModelError("key", "message");
+
+            controller.Create(new Customer());
+
+            Assert.Equal("Customer entity is not valid", controller.ViewBag.Message);
+        }
+
+        [Fact]
+        public void ShouldValidateCustomerModel()
+        {
+            var customer = new Customer()
+            {
+                LastName = "LastName"
+            };
+            var context = new ValidationContext(customer, null, null);
+            var results = new List<ValidationResult>();
+            var isModelStateValid = Validator.TryValidateObject(customer, context, results, true);
+
+            Assert.True(isModelStateValid);
+        }
+
+        [Fact]
+        public void ShouldNotValidateInvalidCustomerModel()
+        {
+            var customer = new Customer();
+            var context = new ValidationContext(customer, null, null);
+            var results = new List<ValidationResult>();
+            var isModelStateValid = Validator.TryValidateObject(customer, context, results, true);
+
+            Assert.False(isModelStateValid);
+        }
+
+        [Fact]
+        public void ShouldEditReturnViewIfModelIsNotValid()
+        {
+            var controller = new CustomerController();
+            controller.ModelState.AddModelError("key", "message");
+
+            var result = controller.Edit(new Customer());
+
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ShouldEditReturnMessageIfModelIsNotValid()
+        {
+            var controller = new CustomerController();
+            controller.ModelState.AddModelError("key", "message");
+
+            controller.Edit(new Customer());
+
+            Assert.Equal("Customer entity is not valid", controller.ViewBag.Message);
         }
     }
 }

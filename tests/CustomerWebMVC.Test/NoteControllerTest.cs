@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using CustomerWebMVC.Controllers;
 using Moq;
 using CustomerManagement.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace CustomerWebMVC.Test
 {
@@ -237,6 +238,80 @@ namespace CustomerWebMVC.Test
 
             var view = result as HttpNotFoundResult;
             Assert.NotNull(view);
+        }
+
+
+
+
+
+
+        [Fact]
+        public void ShouldValidateNoteModel()
+        {
+            var note = new Note()
+            {
+                Text="new note"
+            };
+            var context = new ValidationContext(note, null, null);
+            var results = new List<ValidationResult>();
+            var isModelStateValid = Validator.TryValidateObject(note, context, results, true);
+
+            Assert.True(isModelStateValid);
+        }
+
+        [Fact]
+        public void ShouldNotValidateInvalidNoteModel()
+        {
+            var note = new Note();
+            var context = new ValidationContext(note, null, null);
+            var results = new List<ValidationResult>();
+            var isModelStateValid = Validator.TryValidateObject(note, context, results, true);
+
+            Assert.False(isModelStateValid);
+        }
+
+        [Fact]
+        public void ShouldCreateReturnViewIfModelIsNotValid()
+        {
+            var controller = new NoteController();
+            controller.ModelState.AddModelError("key", "message");
+
+            var result = controller.Create(new Note());
+
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ShouldCreateReturnMessageIfModelIsNotValid()
+        {
+            var controller = new NoteController();
+            controller.ModelState.AddModelError("key", "message");
+
+            controller.Create(new Note());
+
+            Assert.Equal("Note is not valid", controller.ViewBag.Message);
+        }
+
+        [Fact]
+        public void ShouldEditReturnViewIfModelIsNotValid()
+        {
+            var controller = new NoteController();
+            controller.ModelState.AddModelError("key", "message");
+
+            var result = controller.Edit(new Note());
+
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ShouldEditReturnMessageIfModelIsNotValid()
+        {
+            var controller = new NoteController();
+            controller.ModelState.AddModelError("key", "message");
+
+            controller.Edit(new Note());
+
+            Assert.Equal("Note is not valid", controller.ViewBag.Message);
         }
     }
 }
