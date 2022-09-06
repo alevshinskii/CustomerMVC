@@ -10,6 +10,6 @@ public class NoteTestRepository:Repositories.NoteRepository
     }
     public override string GetConnectonString()
     {
-        return "Server=localhost\\sqlexpress;Database=CustomerLib_Levshinskii_Test;Trusted_Connection=true;";
+        return "Server=localhost\\sqlexpress01;Database=CustomerLib_Levshinskii_Test;Trusted_Connection=true;";
     }
 }
