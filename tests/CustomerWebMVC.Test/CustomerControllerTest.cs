@@ -4,11 +4,14 @@ using CustomerWebMVC.Controllers;
 using Moq;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using CustomerManagement.Services;
+using CustomerManagement.Test.Services.CustomerService;
 
 namespace CustomerWebMVC.Test
 {
     public class CustomerControllerTest
     {
+        private readonly CustomerServiceFixture _fixture = new();
         [Fact]
         public void ShouldBeAbleToCreateCustomerController()
         {
@@ -61,10 +64,10 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Create(customer)).Returns(customer);
 
-            var controller = new CustomerController(customerRepoMock.Object);
-            var result = controller.Create(customer);
+            var service = new CustomerService(customerRepoMock.Object);
 
-            customerRepoMock.Verify(x => x.Create(customer), Times.Once);
+            var controller = new CustomerController(service);
+            var result = controller.Create(customer);
 
             var viewResult = result as RedirectToRouteResult;
             Assert.NotNull(viewResult);
@@ -74,18 +77,17 @@ namespace CustomerWebMVC.Test
         [Fact]
         public void ShouldDisplayMessageIfCanNotCreateCustomer()
         {
-            Customer? customer = new Customer()
-            {
-                LastName = "LastName"
-            };
+            var customerService = new Mock<IService<Customer>>();
+            customerService.Setup(x => x.Create(It.IsAny<Customer>())).Returns(_fixture.GetCustomerNull);
+            var service = customerService.Object;
 
-            var customerRepoMock = new Mock<IRepository<Customer>>();
-            customerRepoMock.Setup(x => x.Create(customer)).Returns(customer = null);
+            var customer = new Customer();
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var controller = new CustomerController(service);
+
             var result = controller.Create(customer);
 
-            customerRepoMock.Verify(x => x.Create(customer), Times.Once);
+            customerService.Verify(x => x.Create(It.IsAny<Customer>()), Times.Once);
 
             var viewResult = result as ViewResult;
             Assert.NotNull(viewResult);
@@ -104,7 +106,9 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customer);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = new CustomerService(customerRepoMock.Object);
+
+            var controller = new CustomerController(service);
             var result = controller.Edit(customer.Id);
             var resultView = result as ViewResult;
 
@@ -114,18 +118,16 @@ namespace CustomerWebMVC.Test
         [Fact]
         public void ShouldBeAbleToEditCustomer()
         {
-            Customer customer = new Customer()
-            {
-                LastName = "LastName"
-            };
+            var customerService = new Mock<IService<Customer>>();
+            customerService.Setup(x => x.Update(It.IsAny<Customer>())).Returns(true);
+            var service = customerService.Object;
 
-            var customerRepoMock = new Mock<IRepository<Customer>>();
-            customerRepoMock.Setup(x => x.Update(customer)).Returns(true);
+            var customer = new Customer();
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var controller = new CustomerController(service);
             var result = controller.Edit(customer);
 
-            customerRepoMock.Verify(x => x.Update(customer), Times.Once);
+            customerService.Verify(x => x.Update(customer), Times.Once);
 
             var viewResult = result as RedirectToRouteResult;
             Assert.NotNull(viewResult);
@@ -145,7 +147,9 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customer);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = new CustomerService(customerRepoMock.Object);
+
+            var controller = new CustomerController(service);
             var result = controller.Delete(customer.Id);
             var resultView = result as ViewResult;
 
@@ -155,19 +159,16 @@ namespace CustomerWebMVC.Test
         [Fact]
         public void ShouldBeAbleToDeleteCustomer()
         {
-            Customer customer = new Customer()
-            {
-                Id = 1,
-                LastName = "LastName"
-            };
+            var customer = _fixture.GetCustomer();
 
-            var customerRepoMock = new Mock<IRepository<Customer>>();
-            customerRepoMock.Setup(x => x.Delete(customer.Id)).Returns(true);
+            var customerService = new Mock<IService<Customer>>();
+            customerService.Setup(x => x.Delete(It.IsAny<int>())).Returns(true);
+            var service = customerService.Object;
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var controller = new CustomerController(service);
             var result = controller.Delete(customer);
 
-            customerRepoMock.Verify(x => x.Delete(customer.Id), Times.Once);
+            customerService.Verify(x => x.Delete(customer.Id), Times.Once);
 
             var viewResult = result as RedirectToRouteResult;
             Assert.NotNull(viewResult);
@@ -186,7 +187,9 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customer);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = new CustomerService(customerRepoMock.Object);
+
+            var controller = new CustomerController(service);
             var result = controller.Details(customer.Id);
             var resultView = result as ViewResult;
 
@@ -206,7 +209,9 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customerNull);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = new CustomerService(customerRepoMock.Object);
+
+            var controller = new CustomerController(service);
             var result = controller.Edit(customer.Id);
             var notFoundResult = result as HttpNotFoundResult;
 
@@ -216,17 +221,13 @@ namespace CustomerWebMVC.Test
         [Fact]
         public void ShouldShowMessageIfCanNotUpdateCustomer()
         {
-            Customer customer = new Customer()
-            {
-                Id = 1,
-                LastName = "LastName"
-            };
-            Customer? customerNull = null;
+            var customer = _fixture.GetCustomer();
 
-            var customerRepoMock = new Mock<IRepository<Customer>>();
-            customerRepoMock.Setup(x => x.Update(customer)).Returns(false);
+            var customerService = new Mock<IService<Customer>>();
+            customerService.Setup(x => x.Update(It.IsAny<Customer>())).Returns(false);
+            var service = customerService.Object;
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var controller = new CustomerController(service);
             var result = controller.Edit(customer);
 
             var view = result as ViewResult;
@@ -248,7 +249,9 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customerNull);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = new CustomerService(customerRepoMock.Object);
+
+            var controller = new CustomerController(service);
             var result = controller.Details(customer.Id);
             var notFoundResult = result as HttpNotFoundResult;
 
@@ -268,7 +271,9 @@ namespace CustomerWebMVC.Test
             var customerRepoMock = new Mock<IRepository<Customer>>();
             customerRepoMock.Setup(x => x.Read(customer.Id)).Returns(customerNull);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = new CustomerService(customerRepoMock.Object);
+
+            var controller = new CustomerController(service);
             var result = controller.Delete(customer.Id);
             var notFoundResult = result as HttpNotFoundResult;
 
@@ -278,17 +283,14 @@ namespace CustomerWebMVC.Test
         [Fact]
         public void ShouldShowMessageIfCanNotDeleteCustomer()
         {
-            Customer customer = new Customer()
-            {
-                Id = 1,
-                LastName = "LastName"
-            };
-            Customer? customerNull = null;
+            var customer = _fixture.GetCustomer();
 
-            var customerRepoMock = new Mock<IRepository<Customer>>();
-            customerRepoMock.Setup(x => x.Delete(customer.Id)).Returns(false);
+            var customerService = new Mock<IService<Customer>>();
+            customerService.Setup(x => x.Delete(It.IsAny<int>())).Returns(false);
 
-            var controller = new CustomerController(customerRepoMock.Object);
+            var service = customerService.Object;
+
+            var controller = new CustomerController(service);
             var result = controller.Delete(customer);
 
             var view = result as ViewResult;

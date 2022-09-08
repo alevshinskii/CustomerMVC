@@ -3,28 +3,27 @@ using CustomerManagement.Interfaces;
 using CustomerManagement.Repositories;
 using System.Linq;
 using System.Web.Mvc;
+using CustomerManagement.Services;
 
 namespace CustomerWebMVC.Controllers
 {
     public class CustomerController : Controller
     {
-        private readonly IRepository<Customer> _customerRepository = new CustomerRepository();
-        private readonly IRepository<Address> _addressRepository = new AddressRepository();
-        private readonly IRepository<Note> _noteRepository = new NoteRepository();
+        private readonly IService<Customer> _customerService=new CustomerService();
 
         public int ItemsOnPage = 10;
 
         public CustomerController() { }
 
-        public CustomerController(IRepository<Customer> customerRepository)
+        public CustomerController(IService<Customer> customerService)
         {
-            _customerRepository = customerRepository;
+            _customerService = customerService;
         }
 
 
         public ActionResult Index(int? page)
         {
-            var customers = _customerRepository.ReadAll();
+            var customers = _customerService.GetAll();
             ViewBag.PagesCount = customers.Count() / ItemsOnPage + (customers.Count % 10 > 0 ? 1 : 0);
             if (page > 0)
             {
@@ -52,7 +51,7 @@ namespace CustomerWebMVC.Controllers
                 return View();
             }
 
-            if (_customerRepository.Create(customer) != null)
+            if (_customerService.Create(customer) != null)
             {
                 return RedirectToAction("Index");
             }
@@ -63,7 +62,7 @@ namespace CustomerWebMVC.Controllers
 
         public ActionResult Edit(int id)
         {
-            var customer = _customerRepository.Read(id);
+            var customer = _customerService.Get(id);
 
             if (customer != null)
                 return View(customer);
@@ -80,7 +79,7 @@ namespace CustomerWebMVC.Controllers
                 return View(customer);
             }
 
-            if (_customerRepository.Update(customer))
+            if (_customerService.Update(customer))
             {
                 return RedirectToAction("Index");
             }
@@ -91,13 +90,10 @@ namespace CustomerWebMVC.Controllers
 
         public ActionResult Details(int id)
         {
-            var customer = _customerRepository.Read(id);
+            var customer = _customerService.Get(id);
 
             if (customer != null)
             {
-                customer.Addresses = _addressRepository.ReadAll(id);
-                customer.Notes = _noteRepository.ReadAll(id);
-
                 return View(customer);
             }
 
@@ -106,7 +102,7 @@ namespace CustomerWebMVC.Controllers
 
         public ActionResult Delete(int id)
         {
-            var customer = _customerRepository.Read(id);
+            var customer = _customerService.Get(id);
 
             if (customer != null)
                 return View(customer);
@@ -117,7 +113,7 @@ namespace CustomerWebMVC.Controllers
         [HttpPost]
         public ActionResult Delete(Customer customer)
         {
-            if (_customerRepository.Delete(customer.Id))
+            if (_customerService.Delete(customer.Id))
             {
                 return RedirectToAction("Index");
             }

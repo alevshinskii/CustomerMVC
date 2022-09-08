@@ -96,4 +96,11 @@ public class CustomerServiceFixture
 
         return noteRepositoryMock;
     }
+
+    public Customer? GetCustomerNull()
+    {
+        Customer? customer = null;
+
+        return customer;
+    }
 }
