@@ -1,3 +1,4 @@
+using System;
 using CustomerManagement.Entities;
 using Xunit;
 
@@ -81,6 +82,67 @@ namespace CustomerManagement.Test.CustomerRepository
             var readedCustomer = repository.Read(createdCustomer.Id);
 
             Assert.Null(readedCustomer);
+        }
+
+        [Fact]
+        public void ShouldBeAbleToReadAllCustomers()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.CustomerRepository repository = Fixture.GetCustomerRepository();
+
+            repository.Create(Fixture.GetCustomer());
+            repository.Create(Fixture.GetCustomer());
+
+            var customers = repository.ReadAll();
+
+            Assert.NotEmpty(customers);
+            Assert.Equal(2, customers.Count);
+        }
+
+        [Fact]
+        public void ShouldNotBeAbleToReadAllCustomersById()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.CustomerRepository repository = Fixture.GetCustomerRepository();
+
+            repository.Create(Fixture.GetCustomer());
+            repository.Create(Fixture.GetCustomer());
+
+            Assert.Throws<InvalidOperationException>(() => repository.ReadAll(1));
+        }
+
+        [Fact]
+        public void ShouldUpdateReturnsFalseIfNoLinesAffected()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.CustomerRepository repository = Fixture.GetCustomerRepository();
+
+            var customer = Fixture.GetCustomer();
+
+            repository.Create(customer);
+
+            customer.FirstName = "new first name";
+
+            Assert.False(repository.Update(customer));
+        }
+
+        [Fact]
+        public void ShouldDeleteReturnsFalseIfNoLinesAffected()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.CustomerRepository repository = Fixture.GetCustomerRepository();
+
+            var customer = Fixture.GetCustomer();
+
+            repository.Create(customer);
+
+            customer.FirstName = "new first name";
+
+            Assert.False(repository.Delete(customer.Id));
         }
     }
 }

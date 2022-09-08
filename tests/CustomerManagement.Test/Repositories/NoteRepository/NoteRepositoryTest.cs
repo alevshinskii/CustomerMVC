@@ -81,5 +81,55 @@ namespace CustomerManagement.Test.NoteRepository
             Assert.Null(readedNote);
         }
 
+        [Fact]
+        public void ShouldUpdateReturnsFalseIfNoLinesAffected()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.NoteRepository repository = Fixture.GetNoteRepository();
+            Note note = Fixture.GetNote();
+
+            repository.Create(note);
+
+            note.Text = "new text";
+            note.Id = 0;
+
+            Assert.False(repository.Update(note));
+        }
+
+        [Fact]
+        public void ShouldDeleteReturnsFalseIfNoLinesAffected()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.NoteRepository repository = Fixture.GetNoteRepository();
+            Note note = Fixture.GetNote();
+
+            repository.Create(note);
+
+            note.Text = "new text";
+
+            Assert.False(repository.Delete(0));
+        }
+
+        [Fact]
+
+        public void ShouldBeAbleToReadAllNotes()
+        {
+            Fixture.DeleteAll();
+
+            Repositories.NoteRepository repository = Fixture.GetNoteRepository();
+            Note note = Fixture.GetNote();
+
+            repository.Create(note);
+            repository.Create(note);
+            repository.Create(note);
+
+            var notes = repository.ReadAll();
+
+            Assert.NotEmpty(notes);
+            Assert.Equal(3,notes.Count);
+        }
+
     }
 }

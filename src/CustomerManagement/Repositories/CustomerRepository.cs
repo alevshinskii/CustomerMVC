@@ -135,7 +135,7 @@ namespace CustomerManagement.Repositories
 
         public List<Customer> ReadAll(int entityId)
         {
-            return ReadAll();
+            throw new InvalidOperationException();
         }
 
         public bool Update(Customer entity)
